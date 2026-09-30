@@ -1128,6 +1128,12 @@ h1 {
   padding: 0;
 }
 
+.question-block {
+  position: relative;
+  width: 100%;
+  padding: 0 0 48px;
+}
+
 .question-phone .question {
   margin: 0;
   width: 100%;
@@ -1136,6 +1142,48 @@ h1 {
   word-break: keep-all;
   font-size: 22px;
   line-height: 1.4;
+}
+
+.q-zoom {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 18px;
+  line-height: 1;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.q-zoom-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 22px 32px;
+}
+
+.q-zoom-close {
+  position: absolute;
+  top: 12px;
+  right: 22px;
+}
+
+.q-zoom-text {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+  overflow-wrap: break-word;
+  word-break: keep-all;
 }
 
 .answers.dock {

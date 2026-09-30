@@ -275,6 +275,7 @@ export function createApp(root) {
   let healthTip = pickTip();
   let newsTips = pickTips(2);
   let toast = "";
+  let questionZoomed = false;
 
   function showToast(message) {
     toast = message;
@@ -334,12 +335,14 @@ export function createApp(root) {
   }
 
   function startQuestions() {
+    questionZoomed = false;
     screen = "question";
     render();
   }
 
   function prevQuestion() {
     stopSpeech();
+    questionZoomed = false;
     if (questionIndex > 0) {
       questionIndex -= 1;
       screen = "question";
@@ -352,6 +355,7 @@ export function createApp(root) {
 
   function answer(value) {
     stopSpeech();
+    questionZoomed = false;
     const qs = zoneQuestions(activeZone);
     const current = qs[questionIndex];
     persist(applyAnswer(state, current.id, value));
@@ -739,7 +743,6 @@ export function createApp(root) {
           healthTip,
           `<button class="cta" data-close-health>닫고 점검 시작하기</button>`
         )}
-        <p class="fineprint">토스 뉴스처럼 짧은 안내입니다. 진단이 아니라 집 안을 살필 때 참고용이에요.</p>
       </main>
     `;
   }
@@ -867,7 +870,10 @@ export function createApp(root) {
           <button class="speak" data-speak>소리로 질문 듣기</button>
         </div>
         <div class="question-stage">
-          <p class="question">${q.text}</p>
+          <div class="question-block">
+            <p class="question">${q.text}</p>
+            <button class="q-zoom" data-zoom-question aria-label="질문 크게 보기">🔍</button>
+          </div>
         </div>
         <div class="answers dock">
           <button class="back-q" data-prev-question>${questionIndex > 0 ? "이전 질문" : "미션 안내로"}</button>
@@ -876,6 +882,14 @@ export function createApp(root) {
           <button class="unk ${saved === "unk" ? "picked" : ""}" data-answer="unk">잘 모르겠어요</button>
           <p class="fineprint dock-note">예: 개선할 일에 저장 · 잘 모르겠어요: 가족과 확인할 목록</p>
         </div>
+        ${
+          questionZoomed
+            ? `<div class="q-zoom-layer">
+                <button class="icon-btn q-zoom-close" data-close-zoom aria-label="닫기">✕</button>
+                <p class="q-zoom-text">${q.text}</p>
+              </div>`
+            : ""
+        }
       </main>
     `;
   }
@@ -1086,6 +1100,7 @@ export function createApp(root) {
     root.querySelectorAll("[data-go]").forEach((el) => {
       el.addEventListener("click", () => {
         stopSpeech();
+        questionZoomed = false;
         screen = el.getAttribute("data-go");
         render();
       });
@@ -1114,6 +1129,14 @@ export function createApp(root) {
     root.querySelector("[data-speak]")?.addEventListener("click", () => {
       const qs = zoneQuestions(activeZone);
       speak(qs[questionIndex].text);
+    });
+    root.querySelector("[data-zoom-question]")?.addEventListener("click", () => {
+      questionZoomed = true;
+      render();
+    });
+    root.querySelector("[data-close-zoom]")?.addEventListener("click", () => {
+      questionZoomed = false;
+      render();
     });
     root.querySelectorAll("[data-task]").forEach((el) => {
       el.addEventListener("click", () => toggleTask(el.getAttribute("data-task")));
