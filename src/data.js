@@ -1,5 +1,10 @@
 export const STORAGE_KEY = "home-fall-map-v3";
-export const PET_NAME = "집요정";
+
+export const PETS = [
+  { id: "jibyojeong", name: "집요정", file: "pet-jibyojeong.png" },
+  { id: "nabi", name: "나비", file: "pet-nabi.png" },
+  { id: "bori", name: "보리", file: "pet-bori.png" },
+];
 
 export const ZONES = [
   {

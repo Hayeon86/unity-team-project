@@ -965,6 +965,48 @@ h1 {
   border-radius: 0;
 }
 
+.pick-screen h1 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.pick-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.pick-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  min-height: 96px;
+  border: 3px solid transparent;
+  background: #fff;
+  border-radius: 22px;
+  padding: 10px 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.pick-card.on {
+  border-color: var(--green);
+}
+
+.pick-card img {
+  width: 84px;
+  height: auto;
+  object-fit: contain;
+  background: transparent;
+}
+
+.pick-card .name {
+  font-size: 26px;
+  font-weight: 800;
+}
+
 .splash .pet-ground {
   width: 86px;
   height: 18px;

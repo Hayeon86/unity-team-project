@@ -1,4 +1,4 @@
-import { HEALTH_TIPS, PET_NAME, QUESTIONS, RESULT_BANDS, STORAGE_KEY, ZONES } from "./data.js";
+import { HEALTH_TIPS, PETS, QUESTIONS, RESULT_BANDS, STORAGE_KEY, ZONES } from "./data.js";
 
 const emptyAnswers = () => Object.fromEntries(QUESTIONS.map((q) => [q.id, null]));
 const emptyTasks = () =>
@@ -38,6 +38,7 @@ function blankState() {
     groups: [],
     activeGroupId: null,
     activeMemberId: null,
+    petId: null,
   };
 }
 
@@ -54,6 +55,7 @@ function loadState() {
       groups: parsed.groups ?? [],
       activeGroupId: parsed.activeGroupId ?? null,
       activeMemberId: parsed.activeMemberId ?? null,
+      petId: parsed.petId ?? null,
     };
   } catch {
     return blankState();
@@ -179,20 +181,23 @@ function burstStars(event) {
   }
 }
 
-function petSvg() {
+function petById(id) {
+  return PETS.find((p) => p.id === id) ?? PETS[0];
+}
+
+function petSvg(pet = PETS[0]) {
   return `
     <span class="pet-wrap">
-      <img class="pet-svg house-fairy" src="${import.meta.env.BASE_URL}house-fairy.png?v=4" alt="" />
-      <span class="pet-ground" aria-hidden="true"></span>
+      <img class="pet-svg house-fairy" src="${import.meta.env.BASE_URL}${pet.file}?v=1" alt="" />
     </span>
   `;
 }
 
-function petRow(text) {
+function petRow(text, pet = PETS[0]) {
   return `
     <div class="pet-row">
-      ${petSvg()}
-      <p class="bubble"><strong>${PET_NAME}</strong>${text}</p>
+      ${petSvg(pet)}
+      <p class="bubble"><strong>${esc(pet.name)}</strong>${text}</p>
     </div>
   `;
 }
@@ -267,8 +272,8 @@ function pickTips(count, excludeTitles = []) {
 }
 
 export function createApp(root) {
-  let screen = sessionStorage.getItem("fall-map-splashed") ? "start" : "splash";
   let state = loadState();
+  let screen = sessionStorage.getItem("fall-map-splashed") ? (state.petId ? "start" : "pick") : "splash";
   let activeZone = null;
   let questionIndex = 0;
   let celebrateZone = null;
@@ -276,6 +281,10 @@ export function createApp(root) {
   let newsTips = pickTips(2);
   let toast = "";
   let questionZoomed = false;
+
+  function buddy(text) {
+    return petRow(text, petById(state.petId));
+  }
 
   function showToast(message) {
     toast = message;
@@ -324,6 +333,13 @@ export function createApp(root) {
   }
 
   function beginChecklist() {
+    healthTip = pickTip();
+    screen = "health";
+    render();
+  }
+
+  function selectPet(id) {
+    persist({ ...state, petId: id });
     healthTip = pickTip();
     screen = "health";
     render();
@@ -646,6 +662,7 @@ export function createApp(root) {
   function render() {
     const views = {
       splash: splashView,
+      pick: pickView,
       start: startView,
       health: healthView,
       map: mapView,
@@ -670,7 +687,7 @@ export function createApp(root) {
       sessionStorage.setItem("fall-map-splashed", "1");
       window.setTimeout(() => {
         if (screen === "splash") {
-          screen = "start";
+          screen = "pick";
           render();
         }
       }, 1700);
@@ -681,10 +698,29 @@ export function createApp(root) {
     return `
       <main class="phone splash">
         <p class="kicker light">HOME SAFETY PROJECT</p>
-        ${petSvg()}
+        ${petSvg(PETS[0])}
         <h1>우리집<br />낙상지도</h1>
         <p class="splash-sub">집 안 안전 탐험을 준비하고 있어요</p>
         <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+      </main>
+    `;
+  }
+
+  function pickView() {
+    return `
+      <main class="phone pick-screen">
+        <p class="kicker">HOME SAFETY PROJECT</p>
+        <h1>함께할 친구를<br />골라 주세요</h1>
+        <p class="lead">집 안을 같이 살펴 줄 친구예요.</p>
+        <div class="pick-grid">
+          ${PETS.map(
+            (pet) => `
+            <button class="pick-card ${state.petId === pet.id ? "on" : ""}" data-pick-pet="${pet.id}">
+              <img src="${import.meta.env.BASE_URL}${pet.file}?v=1" alt="" />
+              <span class="name">${esc(pet.name)}</span>
+            </button>`
+          ).join("")}
+        </div>
       </main>
     `;
   }
@@ -714,7 +750,7 @@ export function createApp(root) {
             <span><b>3</b>먼저 고칠 곳 확인</span>
           </div>
         </section>
-        ${petRow("답하면 위험요인을 찾아 고칠 일을 자동으로 적어 둘게요. 방마다 도장도 모아요!")}
+        ${buddy("답하면 위험요인을 찾아 고칠 일을 자동으로 적어 둘게요. 방마다 도장도 모아요!")}
         ${stamps ? `<p class="resume">이어서 탐험 중 · 도장 ${stamps}/6</p>` : ""}
         <button class="cta" data-begin>${stamps ? "이어서 탐험하기" : "우리 집 안전 점검 시작하기"}</button>
         <p class="fineprint">주거환경 점검 안내용 시제품 · 의학적 진단이나 낙상 예측 도구가 아닙니다</p>
@@ -803,7 +839,7 @@ export function createApp(root) {
           <h1>우리 집 탐험</h1>
         </div>
         ${whoLine()}
-        ${petRow("확인하고 싶은 우리집 공간을 꾹 눌러주세요!")}
+        ${buddy("확인하고 싶은 우리집 공간을 꾹 눌러주세요!")}
         ${comparisonBanner()}
         <div class="floorplan live">
           ${zoneCell("bedroom", "bedroom")}
@@ -843,7 +879,7 @@ export function createApp(root) {
         <div class="topbar">
           <button class="icon-btn" data-go="map" aria-label="평면도">✕</button>
         </div>
-        ${petRow(zone.pet)}
+        ${buddy(zone.pet)}
         <section class="mission-card">
           <p class="mission-kicker">방별 미션</p>
           <h1>${zone.mission}</h1>
@@ -869,7 +905,7 @@ export function createApp(root) {
           </div>
           <p class="progress">${zone.mission} · ${questionIndex + 1} / ${qs.length}</p>
           <button class="speak" data-speak>소리로 질문 듣기</button>
-          ${petRow("오른쪽 아래 돋보기를 누르면 질문을 더 크게 볼 수 있어요.")}
+          ${buddy("오른쪽 아래 돋보기를 누르면 질문을 더 크게 볼 수 있어요.")}
         </div>
         <div class="question-stage">
           <div class="question-block">
@@ -910,7 +946,7 @@ export function createApp(root) {
       <main class="phone stamp-screen">
         <div class="stamp-burst">${zone.emoji}</div>
         <h1>${zone.stamp} 획득!</h1>
-        ${petRow(line)}
+        ${buddy(line)}
         <button class="cta" data-finish-stamp>지도로 돌아가기</button>
       </main>
     `;
@@ -965,7 +1001,7 @@ export function createApp(root) {
           <p class="score-note">환경 개선 우선도 ${score}점 · 예 2점, 잘 모르겠어요 1점, 아니요 0점. 시제품용 임시 분류이며 임상 기준이 아닙니다.</p>
         </section>
         ${comparisonBanner()}
-        ${petRow("답변에서 찾은 위험요인과 고칠 일을 모아 두었어요. 끝난 일은 개선 완료를 눌러 주세요.")}
+        ${buddy("답변에서 찾은 위험요인과 고칠 일을 모아 두었어요. 끝난 일은 개선 완료를 눌러 주세요.")}
         <p class="section-label">우리 집 지도</p>
         <div class="mini-map">${mini}</div>
         <p class="section-label">먼저 개선할 항목</p>
@@ -994,7 +1030,7 @@ export function createApp(root) {
         </div>
         <h1>개선할 일</h1>
         ${whoLine()}
-        ${petRow("예라고 답한 항목은 자동으로 여기 저장돼요. 끝나면 개선 완료를 눌러 주세요.")}
+        ${buddy("예라고 답한 항목은 자동으로 여기 저장돼요. 끝나면 개선 완료를 눌러 주세요.")}
         ${comparisonBanner()}
         <p class="section-label">우선 개선 목록</p>
         <div class="list">${
@@ -1015,7 +1051,7 @@ export function createApp(root) {
       return `
         <main class="phone has-nav">
           <h1>모임</h1>
-          ${petRow("복지사가 모임을 만들고, 대상자 이름을 추가한 뒤 한 명씩 점검을 진행하면 돼요.")}
+          ${buddy("복지사가 모임을 만들고, 대상자 이름을 추가한 뒤 한 명씩 점검을 진행하면 돼요.")}
           <div class="list group-forms">
           <section class="item">
             <h3>새 모임 만들기</h3>
@@ -1056,7 +1092,7 @@ export function createApp(root) {
         </div>
         <p class="group-code">모임 코드 ${esc(group.code)}</p>
         <h1>${esc(group.name)}</h1>
-        ${petRow("참여자를 먼저 추가하고, 아래 쌓인 이름 중에서 점검할 사람을 고르면 돼요.")}
+        ${buddy("참여자를 먼저 추가하고, 아래 쌓인 이름 중에서 점검할 사람을 고르면 돼요.")}
         <section class="item">
           <h3>참여자 추가</h3>
           <p>모임장 아래에 참가자가 차례로 쌓여요.</p>
@@ -1114,6 +1150,9 @@ export function createApp(root) {
       el.addEventListener("click", () => answer(el.getAttribute("data-answer")));
     });
     root.querySelector("[data-begin]")?.addEventListener("click", beginChecklist);
+    root.querySelectorAll("[data-pick-pet]").forEach((el) => {
+      el.addEventListener("click", () => selectPet(el.getAttribute("data-pick-pet")));
+    });
     root.querySelector("[data-close-health]")?.addEventListener("click", closeHealth);
     root.querySelector("[data-refresh-news]")?.addEventListener("click", (event) => {
       const btn = event.currentTarget;
