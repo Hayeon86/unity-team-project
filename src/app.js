@@ -1005,14 +1005,14 @@ export function createApp(root) {
           <section class="item">
             <h3>새 모임 만들기</h3>
             <p>모임장은 복지사, 참여자는 점검 대상자예요.</p>
-            <label class="field">모임 이름<input data-group-name placeholder="예: 행복복지관 화요반" /></label>
-            <label class="field">모임장 이름<input data-leader-name placeholder="예: 집요정" /></label>
+            <label class="field"><span>모임 이름</span><input data-group-name placeholder="예: 행복복지관 화요반" autocomplete="name" /></label>
+            <label class="field"><span>모임장 이름</span><input data-leader-name placeholder="예: 집요정" autocomplete="name" /></label>
             <button class="cta" data-create-group>모임 만들기</button>
           </section>
           <section class="item">
             <h3>코드로 참여</h3>
-            <label class="field">모임 코드<input data-join-code placeholder="예: 7K2P" maxlength="8" /></label>
-            <label class="field">내 이름<input data-join-name placeholder="예: 집요정" /></label>
+            <label class="field"><span>모임 코드</span><input data-join-code placeholder="예: 7K2P" maxlength="8" autocapitalize="characters" /></label>
+            <label class="field"><span>내 이름</span><input data-join-name placeholder="예: 집요정" autocomplete="name" /></label>
             <button class="cta ghost" data-join-group>참여하기</button>
           </section>
           </div>
@@ -1045,7 +1045,7 @@ export function createApp(root) {
         <section class="item">
           <h3>참여자 추가</h3>
           <p>모임장 아래에 참가자가 차례로 쌓여요.</p>
-          <label class="field">이름만 적어요<input data-member-name placeholder="예: 집요정" /></label>
+          <label class="field"><span>이름만 적어요</span><input data-member-name type="text" enterkeyhint="done" autocomplete="name" placeholder="예: 집요정" /></label>
           <button class="cta" data-add-member>추가하기</button>
         </section>
         <p class="section-label">참가자 ${group.members.length}명</p>
