@@ -182,7 +182,7 @@ function burstStars(event) {
 function petSvg() {
   return `
     <span class="pet-wrap">
-      <img class="pet-svg house-fairy" src="/house-fairy.png?v=4" alt="" />
+      <img class="pet-svg house-fairy" src="${import.meta.env.BASE_URL}house-fairy.png?v=4" alt="" />
       <span class="pet-ground" aria-hidden="true"></span>
     </span>
   `;
