@@ -1126,12 +1126,12 @@ h1 {
 }
 
 .question-phone .pet-svg {
-  width: 56px;
+  width: 48px;
 }
 
 .question-phone .bubble {
-  font-size: 15px;
-  padding: 12px 14px;
+  font-size: 14px;
+  padding: 10px 12px;
 }
 
 .question-stage {
@@ -1141,25 +1141,24 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding: 0;
+  overflow: hidden;
+  padding: 4px 0;
 }
 
 .question-block {
   position: relative;
   width: 100%;
-  padding: 0 0 76px;
+  max-height: 100%;
+  padding: 0 68px 0 0;
 }
 
 .question-phone .question {
   margin: 0;
   width: 100%;
   text-align: center;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: keep-all;
-  font-size: 28px;
+  font-size: 22px;
   line-height: 1.4;
 }
 
@@ -1167,12 +1166,12 @@ h1 {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   border: 3px solid var(--green);
   border-radius: 16px;
   background: #fff;
-  font-size: 30px;
+  font-size: 28px;
   line-height: 1;
   box-shadow: var(--shadow);
   cursor: pointer;
@@ -1186,7 +1185,8 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 88px 22px 32px;
+  padding: 88px 20px 28px;
+  overflow: hidden;
 }
 
 .q-zoom-close {
@@ -1201,11 +1201,12 @@ h1 {
 
 .q-zoom-text {
   margin: 0;
-  font-size: 40px;
+  max-height: 100%;
+  font-size: 26px;
   font-weight: 800;
   line-height: 1.45;
   text-align: center;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: keep-all;
 }
 
