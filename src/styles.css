@@ -1104,6 +1104,12 @@ h1 {
   position: relative;
 }
 
+.question-phone .topbar .icon-btn {
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+}
+
 .question-phone .progress {
   margin: 0 0 10px;
 }
@@ -1131,7 +1137,7 @@ h1 {
 .question-block {
   position: relative;
   width: 100%;
-  padding: 0 0 48px;
+  padding: 0 0 76px;
 }
 
 .question-phone .question {
@@ -1148,12 +1154,12 @@ h1 {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 40px;
-  height: 40px;
-  border: 2px solid var(--line);
-  border-radius: 10px;
+  width: 64px;
+  height: 64px;
+  border: 3px solid var(--green);
+  border-radius: 16px;
   background: #fff;
-  font-size: 18px;
+  font-size: 30px;
   line-height: 1;
   box-shadow: var(--shadow);
   cursor: pointer;
@@ -1167,13 +1173,17 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 72px 22px 32px;
+  padding: 88px 22px 32px;
 }
 
 .q-zoom-close {
   position: absolute;
   top: 12px;
-  right: 22px;
+  right: 16px;
+  width: 64px;
+  height: 64px;
+  font-size: 28px;
+  border-radius: 18px;
 }
 
 .q-zoom-text {
