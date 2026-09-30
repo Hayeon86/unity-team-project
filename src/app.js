@@ -858,17 +858,16 @@ export function createApp(root) {
     const saved = state.answers[q.id];
     return `
       <main class="phone question-phone">
-        <div class="question-scroll">
+        <div class="question-head">
           <div class="topbar">
             <button class="icon-btn" data-prev-question aria-label="이전">←</button>
             <button class="icon-btn" data-go="map" aria-label="평면도">✕</button>
           </div>
           <p class="progress">${zone.mission} · ${questionIndex + 1} / ${qs.length}</p>
-          ${petRow("천천히 그 자리를 보고, 큰 버튼을 눌러 주세요.")}
           <button class="speak" data-speak>소리로 질문 듣기</button>
-          <div class="question-stage">
-            <p class="question">${q.text}</p>
-          </div>
+        </div>
+        <div class="question-stage">
+          <p class="question">${q.text}</p>
         </div>
         <div class="answers dock">
           <button class="back-q" data-prev-question>${questionIndex > 0 ? "이전 질문" : "미션 안내로"}</button>
