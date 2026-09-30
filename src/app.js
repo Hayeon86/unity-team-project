@@ -743,6 +743,7 @@ export function createApp(root) {
           healthTip,
           `<button class="cta" data-close-health>닫고 점검 시작하기</button>`
         )}
+        <p class="fineprint">진단이 아니라 집 안을 살필 때 참고용입니다.</p>
       </main>
     `;
   }
