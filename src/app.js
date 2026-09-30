@@ -869,6 +869,7 @@ export function createApp(root) {
           </div>
           <p class="progress">${zone.mission} · ${questionIndex + 1} / ${qs.length}</p>
           <button class="speak" data-speak>소리로 질문 듣기</button>
+          ${petRow("오른쪽 아래 돋보기를 누르면 질문을 더 크게 볼 수 있어요.")}
         </div>
         <div class="question-stage">
           <div class="question-block">

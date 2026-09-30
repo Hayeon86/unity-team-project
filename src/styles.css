@@ -1118,7 +1118,20 @@ h1 {
   min-height: 48px;
   padding: 12px 16px;
   font-size: 16px;
-  margin: 0;
+  margin: 0 0 8px;
+}
+
+.question-phone .pet-row {
+  margin: 0 0 4px;
+}
+
+.question-phone .pet-svg {
+  width: 56px;
+}
+
+.question-phone .bubble {
+  font-size: 15px;
+  padding: 12px 14px;
 }
 
 .question-stage {
@@ -1146,7 +1159,7 @@ h1 {
   text-align: center;
   overflow-wrap: break-word;
   word-break: keep-all;
-  font-size: 22px;
+  font-size: 28px;
   line-height: 1.4;
 }
 
@@ -1188,7 +1201,7 @@ h1 {
 
 .q-zoom-text {
   margin: 0;
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 800;
   line-height: 1.45;
   text-align: center;
@@ -1295,10 +1308,6 @@ h1 {
 }
 
 @media (max-height: 740px) {
-  .question-phone .question {
-    font-size: 20px;
-  }
-
   .dock-note {
     display: none;
   }
