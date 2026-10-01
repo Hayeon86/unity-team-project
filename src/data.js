@@ -1,9 +1,23 @@
 export const STORAGE_KEY = "home-fall-map-v3";
+export const DEX_SIZE = 20;
 
 export const PETS = [
-  { id: "jibyojeong", name: "집요정", file: "pet-jibyojeong.png" },
-  { id: "nabi", name: "나비", file: "pet-nabi.png" },
-  { id: "bori", name: "보리", file: "pet-bori.png" },
+  { id: "jibyojeong", name: "집요정", file: "pet-jibyojeong.png", starter: true },
+  { id: "nabi", name: "나비", file: "pet-nabi.png", starter: true },
+  { id: "bori", name: "보리", file: "pet-bori.png", starter: true },
+  { id: "haneul", name: "하늘이", file: "pet-haneul.png" },
+  { id: "laben", name: "라벤", file: "pet-laben.png" },
+  { id: "haetsal", name: "햇살이", file: "pet-haetsal.png" },
+  { id: "iseul", name: "이슬이", file: "pet-iseul.png" },
+  { id: "milky", name: "밀키", file: "pet-milky.png" },
+  { id: "momo", name: "모모", file: "pet-momo.png" },
+  { id: "yeontan", name: "연탄", file: "pet-yeontan.png" },
+  { id: "dalnyang", name: "달냥", file: "pet-dalnyang.png" },
+  { id: "mungchi", name: "뭉치", file: "pet-mungchi.png" },
+  { id: "kong", name: "콩이", file: "pet-kong.png" },
+  { id: "som", name: "솜이", file: "pet-som.png" },
+  { id: "cookie", name: "쿠키", file: "pet-cookie.png" },
+  { id: "coco", name: "코코", file: "pet-coco.png" },
 ];
 
 export const ZONES = [

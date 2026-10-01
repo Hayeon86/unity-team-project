@@ -5,9 +5,19 @@ from PIL import Image
 
 root = Path(r"c:\Users\HYK\OneDrive\바탕 화면\unity-team-project\unity-team-project\public")
 jobs = [
-    (root / "pet-jibyojeong-src.jpg", root / "pet-jibyojeong.png"),
-    (root / "pet-nabi-src.jpg", root / "pet-nabi.png"),
-    (root / "pet-bori-src.png", root / "pet-bori.png"),
+    (root / "pet-haneul-src.jpg", root / "pet-haneul.png"),
+    (root / "pet-laben-src.jpg", root / "pet-laben.png"),
+    (root / "pet-haetsal-src.jpg", root / "pet-haetsal.png"),
+    (root / "pet-iseul-src.jpg", root / "pet-iseul.png"),
+    (root / "pet-milky-src.jpg", root / "pet-milky.png"),
+    (root / "pet-momo-src.jpg", root / "pet-momo.png"),
+    (root / "pet-yeontan-src.jpg", root / "pet-yeontan.png"),
+    (root / "pet-dalnyang-src.jpg", root / "pet-dalnyang.png"),
+    (root / "pet-mungchi-src.jpg", root / "pet-mungchi.png"),
+    (root / "pet-kong-src.jpg", root / "pet-kong.png"),
+    (root / "pet-som-src.jpg", root / "pet-som.png"),
+    (root / "pet-cookie-src.png", root / "pet-cookie.png"),
+    (root / "pet-coco-src.png", root / "pet-coco.png"),
 ]
 
 

@@ -1,4 +1,4 @@
-import { HEALTH_TIPS, PETS, QUESTIONS, RESULT_BANDS, STORAGE_KEY, ZONES } from "./data.js";
+import { DEX_SIZE, HEALTH_TIPS, PETS, QUESTIONS, RESULT_BANDS, STORAGE_KEY, ZONES } from "./data.js";
 
 const emptyAnswers = () => Object.fromEntries(QUESTIONS.map((q) => [q.id, null]));
 const emptyTasks = () =>
@@ -39,6 +39,11 @@ function blankState() {
     activeGroupId: null,
     activeMemberId: null,
     petId: null,
+    ownedPetIds: [],
+    lifetimeStamps: 0,
+    pullsUsed: 0,
+    earnedStampZones: [],
+    lastDrawnPetId: null,
   };
 }
 
@@ -56,6 +61,11 @@ function loadState() {
       activeGroupId: parsed.activeGroupId ?? null,
       activeMemberId: parsed.activeMemberId ?? null,
       petId: parsed.petId ?? null,
+      ownedPetIds: parsed.ownedPetIds ?? (parsed.petId ? [parsed.petId] : []),
+      lifetimeStamps: parsed.lifetimeStamps ?? 0,
+      pullsUsed: parsed.pullsUsed ?? 0,
+      earnedStampZones: parsed.earnedStampZones ?? [],
+      lastDrawnPetId: parsed.lastDrawnPetId ?? null,
     };
   } catch {
     return blankState();
@@ -185,10 +195,14 @@ function petById(id) {
   return PETS.find((p) => p.id === id) ?? PETS[0];
 }
 
+function pullTickets(state) {
+  return Math.max(0, Math.floor((state.lifetimeStamps ?? 0) / 3) - (state.pullsUsed ?? 0));
+}
+
 function petSvg(pet = PETS[0]) {
   return `
     <span class="pet-wrap">
-      <img class="pet-svg house-fairy" src="${import.meta.env.BASE_URL}${pet.file}?v=1" alt="" />
+      <img class="pet-svg house-fairy" src="${import.meta.env.BASE_URL}${pet.file}?v=2" alt="" />
     </span>
   `;
 }
@@ -339,9 +353,40 @@ export function createApp(root) {
   }
 
   function selectPet(id) {
-    persist({ ...state, petId: id });
+    const owned = state.ownedPetIds.includes(id) ? state.ownedPetIds : [...state.ownedPetIds, id];
+    persist({ ...state, petId: id, ownedPetIds: owned });
     healthTip = pickTip();
     screen = "health";
+    render();
+  }
+
+  function drawPet() {
+    const tickets = pullTickets(state);
+    const pool = PETS.filter((pet) => !state.ownedPetIds.includes(pet.id));
+    if (tickets < 1) {
+      showToast("도장 3개를 모으면 뽑을 수 있어요.");
+      return;
+    }
+    if (!pool.length) {
+      showToast("도움 친구를 모두 모았어요.");
+      return;
+    }
+    const pet = pool[Math.floor(Math.random() * pool.length)];
+    persist({
+      ...state,
+      ownedPetIds: [...state.ownedPetIds, pet.id],
+      pullsUsed: state.pullsUsed + 1,
+      lastDrawnPetId: pet.id,
+      petId: pet.id,
+    });
+    screen = "draw";
+    render();
+  }
+
+  function useCompanion(id) {
+    if (!state.ownedPetIds.includes(id)) return;
+    persist({ ...state, petId: id });
+    showToast(`${petById(id).name}와 함께해요.`);
     render();
   }
 
@@ -380,6 +425,13 @@ export function createApp(root) {
       render();
       return;
     }
+    if (!state.earnedStampZones.includes(activeZone)) {
+      persist({
+        ...state,
+        earnedStampZones: [...state.earnedStampZones, activeZone],
+        lifetimeStamps: state.lifetimeStamps + 1,
+      });
+    }
     celebrateZone = activeZone;
     screen = "stamp";
     render();
@@ -414,6 +466,7 @@ export function createApp(root) {
       ...state,
       answers: emptyAnswers(),
       tasks: state.tasks,
+      earnedStampZones: [],
       previous: {
         riskCount: riskCount(state.answers),
         unknownCount: unkItems(state.answers).length,
@@ -646,6 +699,7 @@ export function createApp(root) {
     return `
       <nav class="tabbar" aria-label="하단 메뉴">
         <button class="${active === "map" || active === "result" || active === "tasks" ? "on" : ""}" data-go="map">탐험</button>
+        <button class="${active === "dex" || active === "draw" ? "on" : ""}" data-go="dex">도감</button>
         <button class="${active === "news" || active === "health" ? "on" : ""}" data-go="news">소식</button>
         <button class="${active === "group" ? "on" : ""}" data-go="group">모임</button>
       </nav>
@@ -673,8 +727,10 @@ export function createApp(root) {
       tasks: taskView,
       group: groupView,
       news: newsView,
+      dex: dexView,
+      draw: drawView,
     };
-    const tabScreens = new Set(["map", "news", "group", "result", "tasks"]);
+    const tabScreens = new Set(["map", "news", "group", "result", "tasks", "dex"]);
     const view = (views[screen] ?? startView)();
     root.innerHTML = `
       <div class="shell">
@@ -713,13 +769,15 @@ export function createApp(root) {
         <h1>함께할 친구를<br />골라 주세요</h1>
         <p class="lead">집 안을 같이 살펴 줄 친구예요.</p>
         <div class="pick-grid">
-          ${PETS.map(
-            (pet) => `
+          ${PETS.filter((pet) => pet.starter)
+            .map(
+              (pet) => `
             <button class="pick-card ${state.petId === pet.id ? "on" : ""}" data-pick-pet="${pet.id}">
-              <img src="${import.meta.env.BASE_URL}${pet.file}?v=1" alt="" />
+              <img src="${import.meta.env.BASE_URL}${pet.file}?v=2" alt="" />
               <span class="name">${esc(pet.name)}</span>
             </button>`
-          ).join("")}
+            )
+            .join("")}
         </div>
       </main>
     `;
@@ -801,6 +859,46 @@ export function createApp(root) {
     `;
   }
 
+  function dexView() {
+    const owned = new Set(state.ownedPetIds);
+    const tickets = pullTickets(state);
+    const cells = Array.from({ length: DEX_SIZE }, (_, index) => {
+      const pet = PETS[index];
+      if (!pet || !owned.has(pet.id)) {
+        return `<div class="dex-cell locked" aria-label="아직 모으지 못함"><span>?</span></div>`;
+      }
+      return `
+        <button class="dex-cell on ${state.petId === pet.id ? "using" : ""}" data-use-pet="${pet.id}">
+          <img src="${import.meta.env.BASE_URL}${pet.file}?v=2" alt="" />
+          <span class="dex-name">${esc(pet.name)}</span>
+        </button>`;
+    }).join("");
+    return `
+      <main class="phone has-nav">
+        <p class="kicker">도움 친구</p>
+        <h1 class="news-title">도감 ${owned.size}/${DEX_SIZE}</h1>
+        ${buddy("네모칸을 눌러 함께할 친구를 바꿀 수 있어요. 도장 3개마다 새로운 친구를 뽑아요.")}
+        <p class="pull-note">${tickets ? `지금 뽑기 ${tickets}회 가능` : `다음 뽑기까지 도장 ${3 - (state.lifetimeStamps % 3 || 3)}개`}</p>
+        ${tickets ? `<button class="cta" data-draw-pet>도움 친구 뽑기</button>` : ""}
+        <div class="dex-grid">${cells}</div>
+      </main>
+    `;
+  }
+
+  function drawView() {
+    const pet = petById(state.lastDrawnPetId);
+    return `
+      <main class="phone stamp-screen">
+        <p class="kicker">새로운 친구</p>
+        <h1>${esc(pet.name)} 등장!</h1>
+        ${petSvg(pet)}
+        ${buddy("이제 같이 집을 살펴요. 도감에서 언제든 다시 고를 수 있어요.")}
+        <button class="cta" data-go="dex">도감 보기</button>
+        <button class="cta ghost" data-go="map">탐험으로</button>
+      </main>
+    `;
+  }
+
   function zoneCell(id, extraClass) {
     const zone = zoneById(id);
     const status = zoneStatus(state.answers, id);
@@ -828,6 +926,8 @@ export function createApp(root) {
   function mapView() {
     const done = allAnswered(state.answers);
     const stamps = stampCount(state.answers);
+    const tickets = pullTickets(state);
+    const nextNeed = 3 - (state.lifetimeStamps % 3 || 3);
     return `
       <main class="phone has-nav">
         <div class="topbar">
@@ -841,6 +941,8 @@ export function createApp(root) {
         ${whoLine()}
         ${buddy("확인하고 싶은 우리집 공간을 꾹 눌러주세요!")}
         ${comparisonBanner()}
+        <p class="pull-note">누적 도장 ${state.lifetimeStamps}개 · ${tickets ? `뽑기 ${tickets}회` : `다음 뽑기까지 ${nextNeed}개`}</p>
+        ${tickets ? `<button class="cta" data-draw-pet>도움 친구 뽑기</button>` : ""}
         <div class="floorplan live">
           ${zoneCell("bedroom", "bedroom")}
           ${zoneCell("bath", "bath")}
@@ -942,12 +1044,15 @@ export function createApp(root) {
         : unknown
           ? `${zone.name}에서 확인이 필요한 항목이 있어요. 가족과 함께 보면 좋아요.`
           : `${zone.name}은 지금 확인된 위험요인이 없어요.`;
+    const tickets = pullTickets(state);
     return `
       <main class="phone stamp-screen">
         <div class="stamp-burst">${zone.emoji}</div>
         <h1>${zone.stamp} 획득!</h1>
         ${buddy(line)}
-        <button class="cta" data-finish-stamp>지도로 돌아가기</button>
+        <p class="pull-note">누적 도장 ${state.lifetimeStamps}개 · 3개마다 친구를 뽑아요</p>
+        ${tickets ? `<button class="cta" data-draw-pet>도움 친구 뽑기</button>` : ""}
+        <button class="cta ghost" data-finish-stamp>지도로 돌아가기</button>
       </main>
     `;
   }
@@ -1152,6 +1257,12 @@ export function createApp(root) {
     root.querySelector("[data-begin]")?.addEventListener("click", beginChecklist);
     root.querySelectorAll("[data-pick-pet]").forEach((el) => {
       el.addEventListener("click", () => selectPet(el.getAttribute("data-pick-pet")));
+    });
+    root.querySelectorAll("[data-draw-pet]").forEach((el) => {
+      el.addEventListener("click", drawPet);
+    });
+    root.querySelectorAll("[data-use-pet]").forEach((el) => {
+      el.addEventListener("click", () => useCompanion(el.getAttribute("data-use-pet")));
     });
     root.querySelector("[data-close-health]")?.addEventListener("click", closeHealth);
     root.querySelector("[data-refresh-news]")?.addEventListener("click", (event) => {

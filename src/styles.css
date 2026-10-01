@@ -904,7 +904,7 @@ h1 {
   transform: none;
   bottom: auto;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 6px;
   background: #fffcf7;
   padding: 12px 12px calc(14px + env(safe-area-inset-bottom));
@@ -917,7 +917,7 @@ h1 {
   background: transparent;
   min-height: 52px;
   border-radius: 16px;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: var(--muted);
   cursor: pointer;
@@ -1005,6 +1005,58 @@ h1 {
 .pick-card .name {
   font-size: 26px;
   font-weight: 800;
+}
+
+.pull-note {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--green);
+}
+
+.dex-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 8px 0 20px;
+}
+
+.dex-cell {
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px;
+  min-width: 0;
+}
+
+.dex-cell.locked {
+  background: #e7ece8;
+  color: var(--muted);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.dex-cell.on.using {
+  outline: 3px solid var(--green);
+}
+
+.dex-cell img {
+  width: 72%;
+  height: auto;
+  object-fit: contain;
+}
+
+.dex-name {
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .splash .pet-ground {
