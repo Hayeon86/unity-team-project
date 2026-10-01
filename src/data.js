@@ -1,12 +1,12 @@
 export const STORAGE_KEY = "home-fall-map-v3";
-export const DEX_SIZE = 20;
+export const DEX_SIZE = 16;
 
 export const PETS = [
   { id: "jibyojeong", name: "집요정", file: "pet-jibyojeong.png", starter: true },
   { id: "nabi", name: "나비", file: "pet-nabi.png", starter: true },
   { id: "bori", name: "보리", file: "pet-bori.png", starter: true },
   { id: "haneul", name: "하늘이", file: "pet-haneul.png" },
-  { id: "laben", name: "라벤", file: "pet-laben.png" },
+  { id: "laben", name: "노을이", file: "pet-laben.png" },
   { id: "haetsal", name: "햇살이", file: "pet-haetsal.png" },
   { id: "iseul", name: "이슬이", file: "pet-iseul.png" },
   { id: "milky", name: "밀키", file: "pet-milky.png" },

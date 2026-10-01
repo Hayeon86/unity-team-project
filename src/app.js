@@ -425,13 +425,10 @@ export function createApp(root) {
       render();
       return;
     }
-    if (!state.earnedStampZones.includes(activeZone)) {
-      persist({
-        ...state,
-        earnedStampZones: [...state.earnedStampZones, activeZone],
-        lifetimeStamps: state.lifetimeStamps + 1,
-      });
-    }
+    persist({
+      ...state,
+      lifetimeStamps: state.lifetimeStamps + 1,
+    });
     celebrateZone = activeZone;
     screen = "stamp";
     render();
@@ -480,7 +477,7 @@ export function createApp(root) {
 
   function hardReset() {
     if (!confirm("이 점검 답만 지울까요? 모임은 그대로 둡니다.")) return;
-    persist({ ...state, ...blankInspection() });
+    persist({ ...state, ...blankInspection(), earnedStampZones: [] });
     screen = "map";
     render();
   }
