@@ -299,7 +299,6 @@ export function createApp(root) {
   let questionIndex = 0;
   let celebrateZone = null;
   let healthTip = pickTip();
-  let newsTips = [...HEALTH_TIPS];
   let readingTip = null;
   let articleBack = "news";
   let toast = "";
@@ -856,11 +855,7 @@ export function createApp(root) {
         </div>
         <p class="kicker">안전 소식</p>
         <h1 class="news-title">낙상 예방 한 줄 뉴스</h1>
-        <button class="cta ghost refresh-bar" data-refresh-news>
-          <span class="spin-icon" aria-hidden="true">↻</span>
-          새로고침
-        </button>
-        ${newsTips.map((tip) => healthCard(tip, "")).join("")}
+        ${HEALTH_TIPS.map((tip) => healthCard(tip, "")).join("")}
       </main>
     `;
   }
@@ -1306,14 +1301,6 @@ export function createApp(root) {
       screen = articleBack;
       readingTip = null;
       render();
-    });
-    root.querySelector("[data-refresh-news]")?.addEventListener("click", (event) => {
-      const btn = event.currentTarget;
-      btn.classList.remove("spinning");
-      void btn.offsetWidth;
-      btn.classList.add("spinning");
-      newsTips = [...HEALTH_TIPS].sort(() => Math.random() - 0.5);
-      window.setTimeout(() => render(), 420);
     });
     root.querySelector("[data-start-questions]")?.addEventListener("click", startQuestions);
     root.querySelector("[data-finish-stamp]")?.addEventListener("click", finishStamp);
