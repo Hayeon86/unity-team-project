@@ -285,6 +285,13 @@ function pickTips(count, excludeTitles = []) {
   return shuffled.slice(0, count);
 }
 
+function coverHtml(tip, extraClass = "") {
+  if (tip.image) {
+    return `<div class="news-cover ${extraClass}"><img src="${import.meta.env.BASE_URL}${tip.image}" alt="" /></div>`;
+  }
+  return `<div class="news-cover placeholder ${extraClass}" aria-hidden="true"></div>`;
+}
+
 export function createApp(root) {
   let state = loadState();
   let screen = sessionStorage.getItem("fall-map-splashed") ? (state.petId ? "start" : "pick") : "splash";
@@ -292,7 +299,9 @@ export function createApp(root) {
   let questionIndex = 0;
   let celebrateZone = null;
   let healthTip = pickTip();
-  let newsTips = pickTips(2);
+  let newsTips = [...HEALTH_TIPS];
+  let readingTip = null;
+  let articleBack = "news";
   let toast = "";
   let questionZoomed = false;
 
@@ -391,6 +400,7 @@ export function createApp(root) {
   }
 
   function closeHealth() {
+    readingTip = null;
     screen = "map";
     render();
   }
@@ -697,7 +707,7 @@ export function createApp(root) {
       <nav class="tabbar" aria-label="하단 메뉴">
         <button class="${active === "map" || active === "result" || active === "tasks" ? "on" : ""}" data-go="map">탐험</button>
         <button class="${active === "dex" || active === "draw" ? "on" : ""}" data-go="dex">도감</button>
-        <button class="${active === "news" || active === "health" ? "on" : ""}" data-go="news">소식</button>
+        <button class="${active === "news" || active === "health" || active === "article" ? "on" : ""}" data-go="news">소식</button>
         <button class="${active === "group" ? "on" : ""}" data-go="group">모임</button>
       </nav>
     `;
@@ -724,6 +734,7 @@ export function createApp(root) {
       tasks: taskView,
       group: groupView,
       news: newsView,
+      article: articleView,
       dex: dexView,
       draw: drawView,
     };
@@ -815,13 +826,13 @@ export function createApp(root) {
 
   function healthCard(tip, closer) {
     return `
-      <article class="news-card big">
+      <button class="news-card tap" data-open-news="${tip.id}">
+        ${coverHtml(tip)}
         <span class="news-tag">${esc(tip.tag)}</span>
         <h2>${esc(tip.title)}</h2>
-        <p>${esc(tip.body)}</p>
-        <p class="news-source">${esc(tip.source)}</p>
-        ${closer}
-      </article>
+        <p>${esc(tip.subtitle)}</p>
+      </button>
+      ${closer}
     `;
   }
 
@@ -830,10 +841,8 @@ export function createApp(root) {
       <main class="phone">
         <p class="kicker">오늘의 안전 소식</p>
         <h1 class="news-title">잠깐, 알고 가면 좋아요</h1>
-        ${healthCard(
-          healthTip,
-          `<button class="cta" data-close-health>닫고 점검 시작하기</button>`
-        )}
+        ${healthCard(healthTip, "")}
+        <button class="cta" data-close-health>닫고 점검 시작하기</button>
         <p class="fineprint">진단이 아니라 집 안을 살필 때 참고용입니다.</p>
       </main>
     `;
@@ -852,6 +861,28 @@ export function createApp(root) {
           새로고침
         </button>
         ${newsTips.map((tip) => healthCard(tip, "")).join("")}
+      </main>
+    `;
+  }
+
+  function articleView() {
+    const tip = readingTip ?? healthTip;
+    return `
+      <main class="phone article-phone">
+        <div class="topbar article-bar">
+          <p class="article-kicker">${esc(tip.tag)}</p>
+          <button class="icon-btn" data-close-article aria-label="닫기">✕</button>
+        </div>
+        ${coverHtml(tip, "tall")}
+        <h1 class="article-title">${esc(tip.title)}</h1>
+        <p class="news-lede">${esc(tip.subtitle)}</p>
+        ${tip.paragraphs.map((p) => `<p class="article-p">${esc(p)}</p>`).join("")}
+        <p class="news-source">출처 ${esc(tip.source)}</p>
+        ${
+          articleBack === "health"
+            ? `<button class="cta" data-close-health>닫고 점검 시작하기</button>`
+            : ""
+        }
       </main>
     `;
   }
@@ -1262,12 +1293,26 @@ export function createApp(root) {
       el.addEventListener("click", () => useCompanion(el.getAttribute("data-use-pet")));
     });
     root.querySelector("[data-close-health]")?.addEventListener("click", closeHealth);
+    root.querySelectorAll("[data-open-news]").forEach((el) => {
+      el.addEventListener("click", () => {
+        const id = el.getAttribute("data-open-news");
+        readingTip = HEALTH_TIPS.find((tip) => tip.id === id) ?? healthTip;
+        articleBack = screen === "health" ? "health" : "news";
+        screen = "article";
+        render();
+      });
+    });
+    root.querySelector("[data-close-article]")?.addEventListener("click", () => {
+      screen = articleBack;
+      readingTip = null;
+      render();
+    });
     root.querySelector("[data-refresh-news]")?.addEventListener("click", (event) => {
       const btn = event.currentTarget;
       btn.classList.remove("spinning");
       void btn.offsetWidth;
       btn.classList.add("spinning");
-      newsTips = pickTips(2, newsTips.map((tip) => tip.title));
+      newsTips = [...HEALTH_TIPS].sort(() => Math.random() - 0.5);
       window.setTimeout(() => render(), 420);
     });
     root.querySelector("[data-start-questions]")?.addEventListener("click", startQuestions);
